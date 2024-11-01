@@ -3,11 +3,13 @@ import java.util.*;
 class Process {
     private String process_id;
     private int arrive_time, burst_time;
+    private int totalB_time;
 
     public Process(String _id, int _atime, int _btime) {
         this.process_id = _id;
         this.arrive_time = _atime;
         this.burst_time = _btime;
+        totalB_time = _btime;
     }
     public String getProcessId() {
         return process_id;
@@ -22,6 +24,9 @@ class Process {
     }
     public void useBurstTime(int _setting){
         burst_time -= _setting;
+    }
+    public int watingTime(int _time){
+        return _time - arrive_time - totalB_time;
     }
 }
 
@@ -44,6 +49,7 @@ public class Scheduling {
         Process_zip.add(new Process("P9", 8, 2)); 
         Process_zip.add(new Process("P10", 9, 1)); 
         //SJFS(Process_zip);
+        //RRS(Process_zip, 4);
         RRS(Process_zip, 8);
     }
     public static void SJFS(PriorityQueue<Process> _processzip){
@@ -58,6 +64,8 @@ public class Scheduling {
 
         int time = 0;
         int zip_size;
+        double totalW_time = 0;
+        int totalP_size = process_zip.size();
         boolean check_PriorityProcess;
         Process execute_Process;
         Process test_process;
@@ -97,6 +105,7 @@ public class Scheduling {
                 else if(execute_Process.getBurstTime()==0){
                     sb.append(execute_Process.getProcessId()+"("+now_time+"~"+time+")  " );
                     System.out.println(sb.toString()+"\n");
+                    totalW_time+=execute_Process.watingTime(time);
                     print_ReadyQueue(Ready_Queue);
                     break;
                 }
@@ -107,6 +116,7 @@ public class Scheduling {
         }
         sb.append("]").append("\n");
         System.out.print(sb.toString());
+        System.out.printf("Average Wating time : %.1f", totalW_time/totalP_size);
     }
     public static void RRS(PriorityQueue<Process> _processzip, int time_assignment){
         Queue<Process> Ready_Queue = new LinkedList<>();
@@ -115,6 +125,8 @@ public class Scheduling {
 
         int time=0;
         int zip_size;
+        double totalW_time = 0;
+        int totalP_size = process_zip.size();
         Process execute_Process;
         Process test_process;
 
@@ -140,15 +152,22 @@ public class Scheduling {
                 if(time-now_time==time_assignment){
                     if(execute_Process.getBurstTime()>0){
                         Ready_Queue.offer(execute_Process);
+                        sb.append(execute_Process.getProcessId()+"("+now_time+"~"+time+")  " );
+                        System.out.println(sb.toString()+"\n");
+                        print_ReadyQueue(Ready_Queue);
                     }
-                    sb.append(execute_Process.getProcessId()+"("+now_time+"~"+time+")  " );
-                    System.out.println(sb.toString()+"\n");
-                    print_ReadyQueue(Ready_Queue);
+                    else{
+                        sb.append(execute_Process.getProcessId()+"("+now_time+"~"+time+")  " );
+                        System.out.println(sb.toString()+"\n");
+                        totalW_time+=execute_Process.watingTime(time);
+                        print_ReadyQueue(Ready_Queue);
+                    }
                     break;
                 }
                 else if(execute_Process.getBurstTime()==0){
                     sb.append(execute_Process.getProcessId()+"("+now_time+"~"+time+")  " );
                     System.out.println(sb.toString()+"\n");
+                    totalW_time+=execute_Process.watingTime(time);
                     print_ReadyQueue(Ready_Queue);
                     break;
                 }
@@ -158,7 +177,8 @@ public class Scheduling {
             }
         }
         sb.append("]" +"\n");
-        System.out.println(sb.toString());
+        System.out.print(sb.toString());
+        System.out.printf("Average Wating time : %.1f", totalW_time/totalP_size);
     }
     public static void print_ReadyQueue(Queue<Process> _ReadyQueue){
         StringBuilder sb = new StringBuilder();
