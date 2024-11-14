@@ -4,7 +4,7 @@ import java.awt.Color; // 컬러형태의 이미지를 색상으로 표현하기
 import java.awt.image.BufferedImage; // 이미지 불러오기와 저장하기 위한 자료형
 import javax.imageio.ImageIO; // 이미지 입출력
 
-public class DivideToIRGB{
+public class Gray2{
     private BufferedImage SourceImage = null; // BufferedImage 자료형에 null값 부여
     private BufferedImage TargetImage = null;
 
@@ -14,11 +14,11 @@ public class DivideToIRGB{
     
     private Color color, new_color; // color = 이미지 색상 불러온 값, new_color = 변형된 색상 값
     private int average; //RGB (8비트), +투명도 (8비트)
-    
+
     private File U_InputFile = null; // 불러올 파일 이름과 경로를 저장할 변수
     private File U_OutputFile = null;
 
-    public DivideToIRGB(String U_InputFile_Path, String U_OutputFile_Path){
+    public Gray2(String U_InputFile_Path, String U_OutputFile_Path){
         //Read in the input image
         U_InputFile = new File(U_InputFile_Path);
         U_OutputFile = new File(U_OutputFile_Path);
@@ -34,8 +34,6 @@ public class DivideToIRGB{
         //Get image width & height
         width = SourceImage.getWidth();
         height = SourceImage.getHeight();
-        int m_width = width/2;
-        int m_height = height/2;
 
         //Make TargetImage white image
         new_color = new Color(255, 255, 255);
@@ -44,49 +42,25 @@ public class DivideToIRGB{
                 TargetImage.setRGB(row, column, new_color.getRGB()); //new_color(흰색) 값 부여
             }
         }
-        //DivideToI
-        for(column = 0; column<=height-1; column++){
-            for(row = 0; row<=width-1; row++){
-                //픽셀 하나를 읽어온다
-                color = new Color(SourceImage.getRGB(row, column)); // 입력된 이미지에서 row, column 위치에 한 픽셀을 불러옴
-                //출력 이미지에 불러온 픽셀 입력
-                TargetImage.setRGB(row/2, column/2, color.getRGB()); 
-            }
-        }
-        //DivideToR
+        
+        //Color Change
         for(column = 0; column<=height-1; column++){
             for(row = 0; row<=width-1; row++){
                 //픽셀 하나를 읽어온다
                 color = new Color(SourceImage.getRGB(row, column)); // 입력된 이미지에서 row, column 위치에 한 픽셀을 불러옴
                 red = (int) (color.getRed());
-                color = new Color(red, 0, 0);
-                //출력 이미지에 불러온 픽셀 입력
-                TargetImage.setRGB(m_width+row/2, column/2, color.getRGB()); 
-            }
-        }
-        //DivideToG
-        for(column = 0; column<=height-1; column++){
-            for(row = 0; row<=width-1; row++){
-                //픽셀 하나를 읽어온다
-                color = new Color(SourceImage.getRGB(row, column)); // 입력된 이미지에서 row, column 위치에 한 픽셀을 불러옴
                 green = (int) (color.getGreen());
-                color = new Color(0,green, 0);
-                //출력 이미지에 불러온 픽셀 입력
-                TargetImage.setRGB(row/2, m_height+column/2, color.getRGB()); 
-            }
-        }
-        //DivideToB
-        for(column = 0; column<=height-1; column++){
-            for(row = 0; row<=width-1; row++){
-                //픽셀 하나를 읽어온다
-                color = new Color(SourceImage.getRGB(row, column)); // 입력된 이미지에서 row, column 위치에 한 픽셀을 불러옴
                 blue = (int) (color.getBlue());
-                color = new Color(0, 0, blue);
+                int red_gray2 = (int)(red * 0.2989);
+                int green_gray2 = (int)(green * 0.5870);
+                int blue_gray2 = (int)(blue * 0.1140);
+                int gray2 = red_gray2 + green_gray2 + blue_gray2;
+                color = new Color(gray2, gray2, gray2);
                 //출력 이미지에 불러온 픽셀 입력
-                TargetImage.setRGB(m_width+row/2, m_height+column/2, color.getRGB()); 
+                TargetImage.setRGB(row, column, color.getRGB()); 
             }
         }
-
+        
         //Write out the result image
         try{ //이미지를 지정된 경로로 저장하고 예외 처리
             ImageIO.write(TargetImage, "png", U_OutputFile); 
