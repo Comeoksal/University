@@ -82,6 +82,7 @@ public class Main {
                 }
             }
         }
+        //프레임 할당, 페이지 테이블 기입이 완료된 프로세스를 큐에 삽입
         Process_List.offer(process);
     }
     static void terminateProcess(){
