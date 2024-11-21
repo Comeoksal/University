@@ -4,7 +4,7 @@ import java.awt.Color; // 컬러형태의 이미지를 색상으로 표현하기
 import java.awt.image.BufferedImage; // 이미지 불러오기와 저장하기 위한 자료형
 import javax.imageio.ImageIO; // 이미지 입출력
 
-public class BrighterByDifference{
+public class EdgeDifference{
     private BufferedImage SourceImage = null; // BufferedImage 자료형에 null값 부여
     private BufferedImage TargetImage = null;
 
@@ -18,7 +18,7 @@ public class BrighterByDifference{
     private File U_InputFile = null; // 불러올 파일 이름과 경로를 저장할 변수
     private File U_OutputFile = null;
 
-    public BrighterByDifference(String U_InputFile_Path, String U_OutputFile_Path){
+    public EdgeDifference(String U_InputFile_Path, String U_OutputFile_Path, int _edge){
         //Read in the input image
         U_InputFile = new File(U_InputFile_Path);
         U_OutputFile = new File(U_OutputFile_Path);
@@ -51,27 +51,32 @@ public class BrighterByDifference{
                 red = (int) (color.getRed());
                 green = (int) (color.getGreen());
                 blue = (int) (color.getBlue());
+                int gray = (int)((red + green + blue)/3);
 
-                int gray1 = (red+green+blue)/3;
+                if(column!=height-1&&row!=width-1){
+                    Color color_right = new Color(SourceImage.getRGB(row+1, column));
+                        red = (int) (color_right.getRed());
+                        green = (int) (color_right.getGreen());
+                        blue = (int) (color_right.getBlue());
+            
+                        int gray_right = (int)((red + green+ blue)/3);
+                        int difference1 = Math.abs(gray-gray_right);
+                        if(difference1>_edge){
+                            color_right = new Color(difference1, difference1, difference1);
+                            TargetImage.setRGB(row, column, color_right.getRGB());
+                        }
 
-                int red_gray2 = (int)(red * 0.2989);
-                int green_gray2 = (int)(green * 0.5870);
-                int blue_gray2 = (int)(blue * 0.1140);
-                int gray2 = red_gray2 + green_gray2 + blue_gray2;
-                int _brightValue;
-                if(gray2==gray1){
-                    _brightValue=0;
+                        Color color_down = new Color(SourceImage.getRGB(row, column+1));
+                        red = (int) (color_down.getRed());
+                        green = (int) (color_down.getGreen());
+                        blue = (int) (color_down.getBlue());
+                        int gray_down = (int)((red + green+ blue)/3);
+                        int difference2 = Math.abs(gray-gray_down);
+                        if(difference2>_edge){
+                            color_down = new Color(difference2, difference2,difference2);
+                            TargetImage.setRGB(row, column, color_down.getRGB());
+                        }
                 }
-                else{
-                    _brightValue = Math.abs(gray1-gray2);
-                }
-                int b_red = (red+_brightValue>255)? 255 : ((red+_brightValue<0) ? 0 : red + _brightValue);
-                int b_green = (green+_brightValue>255)? 255 : ((green+_brightValue<0) ? 0 : green + _brightValue);
-                int b_blue = (blue+_brightValue>255)? 255 : ((blue+_brightValue<0) ? 0 : blue + _brightValue);
-                
-                color = new Color(b_red, b_green, b_blue);
-                //출력 이미지에 불러온 픽셀 입력
-                TargetImage.setRGB(row, column, color.getRGB()); 
             }
         }
         
@@ -84,3 +89,4 @@ public class BrighterByDifference{
         }
     }
 }
+

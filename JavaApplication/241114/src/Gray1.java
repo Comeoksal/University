@@ -61,7 +61,7 @@ public class Gray1{
         
         //Write out the result image
         try{ //이미지를 지정된 경로로 저장하고 예외 처리
-            ImageIO.write(TargetImage, "png", U_OutputFile); 
+            ImageIO.write(TargetImage, "jpg", U_OutputFile); 
         }
         catch(IOException e){ //에러 발생시 출력
             System.out.println(e);
